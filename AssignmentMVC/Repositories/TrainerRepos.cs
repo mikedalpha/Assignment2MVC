@@ -26,11 +26,53 @@ namespace AssignmentMVC.Repositories
             return dbContext.Trainers.Find(id);
         }
 
-        public void Create(Trainer trainer)
+        public void AttachTrainerCourses(Trainer trainer)
         {
-            dbContext.Entry(trainer).State = EntityState.Added;
-            SaveChanges();
+            dbContext.Trainers.Attach(trainer);
+            dbContext.Entry(trainer).Collection("Courses").Load();
         }
+
+        public void ClearTrainerCourses(Trainer trainer)
+        {
+            trainer.Courses.Clear();
+        }
+
+        public void AssignTrainerCourses(Trainer trainer, IEnumerable<int> SelectedCourseIds)
+        {
+            if (SelectedCourseIds != null)
+            {
+                foreach (var id in SelectedCourseIds)
+                {
+                    Course course = dbContext.Courses.Find(id);
+                    if (course != null)
+                    {
+                        trainer.Courses.Add(course);
+                    }
+                }
+            }
+
+            dbContext.Entry(trainer).State = EntityState.Added;
+        }
+
+        //public void Create(Trainer trainer, IEnumerable<int> SelectedCourseIds)
+        //{
+        //    dbContext.Trainers.Attach(trainer);
+        //    dbContext.Entry(trainer).Collection("Courses").Load();
+
+        //    if (SelectedCourseIds != null)
+        //    {
+        //        foreach (var id in SelectedCourseIds)
+        //        {
+        //            Course course = dbContext.Courses.Find(id);
+        //            if (course != null)
+        //            {
+        //                trainer.Courses.Add(course);
+        //            }
+        //        }
+        //    }
+
+        //    dbContext.Entry(trainer).State = EntityState.Added;
+        //}
 
         public void Edit(Trainer trainer)
         {

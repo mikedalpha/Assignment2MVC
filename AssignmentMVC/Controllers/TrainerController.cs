@@ -1,5 +1,7 @@
-﻿using System.Linq;
+﻿using System.Collections.Generic;
+using System.Linq;
 using System.Net;
+using System.Security.Cryptography.X509Certificates;
 using System.Web.Mvc;
 using AssignmentMVC.Models;
 using AssignmentMVC.Repositories;
@@ -8,17 +10,19 @@ namespace AssignmentMVC.Controllers
 {
     public class TrainerController : Controller
     {
-        private readonly TrainerRepos _repos;
+        private readonly TrainerRepos trainerRepos;
+        private readonly CourseRepos courseRepos;
 
         public TrainerController()
         {
-            _repos = new TrainerRepos();
+            trainerRepos = new TrainerRepos();
+            courseRepos = new CourseRepos();
         }
 
         // GET: Trainer
         public ActionResult Index()
         {
-            var trainers = _repos.Get();
+            var trainers = trainerRepos.Get();
             return View(trainers);
         }
 
@@ -29,7 +33,7 @@ namespace AssignmentMVC.Controllers
             {
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
             }
-            Trainer trainer = _repos.Find(id);
+            Trainer trainer = trainerRepos.Find(id);
             if (trainer == null)
             {
                 return HttpNotFound();
@@ -40,13 +44,11 @@ namespace AssignmentMVC.Controllers
         // GET: Trainer/Create
         public ActionResult Create()
         {
-            //ViewBag.SelectedTrainerIds = _repos.Get().Select(t => new SelectListItem()
-            //{
-            //    Value = t.TrainerId.ToString(),
-            //    Text = $"{t.FirstName} {t.LastName}"
-            //});
-
-
+            ViewBag.SelectedCourseIds = courseRepos.Get().Select(c => new SelectListItem()
+            {
+                Value = c.CourseId.ToString(),
+                Text = c.Title
+            });
 
             return View();
         }
@@ -56,12 +58,15 @@ namespace AssignmentMVC.Controllers
         // more details see https://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Create([Bind(Include = "TrainerId,FirstName,LastName,Subject")] Trainer trainer)
+        public ActionResult Create([Bind(Include = "TrainerId,FirstName,LastName,Subject")] Trainer trainer, IEnumerable<int> SelectedCourseIds)
         {
             if (ModelState.IsValid)
             {
-                _repos.Create(trainer);
-                _repos.SaveChanges();
+                trainerRepos.AttachTrainerCourses(trainer);
+                trainerRepos.SaveChanges();
+                trainerRepos.AssignTrainerCourses(trainer, SelectedCourseIds);
+                //trainerRepos.Create(trainer, SelectedCourseIds);
+                trainerRepos.SaveChanges();
                 return RedirectToAction("Index");
             }
 
@@ -75,7 +80,7 @@ namespace AssignmentMVC.Controllers
             {
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
             }
-            Trainer trainer = _repos.Find(id);
+            Trainer trainer = trainerRepos.Find(id);
             if (trainer == null)
             {
                 return HttpNotFound();
@@ -92,7 +97,7 @@ namespace AssignmentMVC.Controllers
         {
             if (ModelState.IsValid)
             {
-                _repos.Edit(trainer);
+                trainerRepos.Edit(trainer);
                 return RedirectToAction("Index");
             }
             return View(trainer);
@@ -105,7 +110,7 @@ namespace AssignmentMVC.Controllers
             {
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
             }
-            Trainer trainer = _repos.Find(id);
+            Trainer trainer = trainerRepos.Find(id);
             if (trainer == null)
             {
                 return HttpNotFound();
@@ -118,8 +123,8 @@ namespace AssignmentMVC.Controllers
         [ValidateAntiForgeryToken]
         public ActionResult DeleteConfirmed(int id)
         {
-            Trainer trainer = _repos.Find(id);
-            _repos.Delete(trainer);
+            Trainer trainer = trainerRepos.Find(id);
+            trainerRepos.Delete(trainer);
             return RedirectToAction("Index");
         }
 
@@ -127,7 +132,7 @@ namespace AssignmentMVC.Controllers
         {
             if (disposing)
             {
-                _repos.Dispose();
+                trainerRepos.Dispose();
             }
             base.Dispose(disposing);
         }
