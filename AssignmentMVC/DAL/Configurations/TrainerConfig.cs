@@ -19,6 +19,5 @@ namespace AssignmentMVC.DAL.Configurations
                 .IsRequired()
                 .HasMaxLength(50);
         }
-
     }
 }

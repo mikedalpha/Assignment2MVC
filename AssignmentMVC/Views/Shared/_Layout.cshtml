@@ -6,34 +6,81 @@
     <title>@ViewBag.Title - My ASP.NET Application</title>
     @Styles.Render("~/Content/css")
     @Scripts.Render("~/bundles/modernizr")
-
+    <script src="https://use.fontawesome.com/releases/v5.0.8/js/all.js"></script>
+    <link rel="shortcut icon" href="#">
 </head>
+
 <body>
-    <div class="navbar navbar-inverse navbar-fixed-top">
-        <div class="container">
-            <div class="navbar-header">
-                <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
-                    <span class="icon-bar"></span>
-                    <span class="icon-bar"></span>
-                    <span class="icon-bar"></span>
-                </button>
-                @Html.ActionLink("Application name", "Index", "Home", new { area = "" }, new { @class = "navbar-brand" })
-            </div>
-            <div class="navbar-collapse collapse">
-                <ul class="nav navbar-nav">
-                    <li>@Html.ActionLink("Home", "Index", "Home")</li>
-                    <li>@Html.ActionLink("About", "About", "Home")</li>
-                    <li>@Html.ActionLink("Contact", "Contact", "Home")</li>
+
+    <!-- Navigation -->
+    <nav class="navbar navbar-expand-md navbar-light bg-light sticky-top">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="~/Home/Index"><img src="~/Content/img/MS logo.jpg" /></a>
+            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarResponsive">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarResponsive">
+                <ul class="navbar-nav ml-auto">
+                    <li class="nav-item">
+                        @Html.ActionLink("Home","Index", "Home")
+                    </li>
+                    <li class="nav-item">
+                        @Html.ActionLink("Courses","Index","Course")
+                    </li>
+                    <li class="nav-item">
+                        @Html.ActionLink("Trainers","Index","Trainer")
+                    </li>
+                    <li class="nav-item">
+                        Students
+                    </li>
+                    <li class="nav-item">
+                        Assignments
+                    </li>
+                    <li class="nav-item">
+                        @Html.Partial("_LoginPartial")
+                    </li>
                 </ul>
-                @Html.Partial("_LoginPartial")
             </div>
         </div>
-    </div>
+    </nav>
+
     <div class="container body-content">
         @RenderBody()
         <hr />
+        <!--- Footer -->
         <footer>
-            <p>&copy; @DateTime.Now.Year - My ASP.NET Application</p>
+            <div class="container-fluid padding">
+                <div class="row text-center">
+                    <div class="col-md-4">
+                        <img src="~/Content/img/MS logo - Dark.jpg" />
+                        <hr class="light" />
+                        <p>555-555-5555</p>
+                        <p>contact@michaelschools.com</p>
+                        <p>135 Fake Street</p>
+                        <p>City, State, 19400</p>
+                    </div>
+                    <div class="col-md-4">
+                        <hr class="light" />
+                        <h5>Our hours</h5>
+                        <hr class="light" />
+                        <p>Monday - Friday: 9am - 5pm</p>
+                        <p>Saturday: Closed</p>
+                        <p>Sunday: Closed</p>
+                    </div>
+                    <div class="col-md-4">
+                        <hr class="light" />
+                        <h5>Service Area</h5>
+                        <hr class="light" />
+                        <p>Attica</p>
+                        <p>Thessalonike</p>
+                        <p>Chania</p>
+                    </div>
+                    <div class="col-12">
+                        <hr class="light" />
+                        <h5>&copy; Michael Schools 2021</h5>
+                    </div>
+                </div>
+            </div>
         </footer>
     </div>
 

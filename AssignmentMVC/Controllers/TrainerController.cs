@@ -1,12 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Data;
-using System.Data.Entity;
-using System.Linq;
+﻿using System.Linq;
 using System.Net;
-using System.Web;
 using System.Web.Mvc;
-using AssignmentMVC.DAL;
 using AssignmentMVC.Models;
 using AssignmentMVC.Repositories;
 
@@ -46,6 +40,14 @@ namespace AssignmentMVC.Controllers
         // GET: Trainer/Create
         public ActionResult Create()
         {
+            //ViewBag.SelectedTrainerIds = _repos.Get().Select(t => new SelectListItem()
+            //{
+            //    Value = t.TrainerId.ToString(),
+            //    Text = $"{t.FirstName} {t.LastName}"
+            //});
+
+
+
             return View();
         }
 
