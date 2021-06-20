@@ -1,9 +1,8 @@
 ﻿using System.Collections.Generic;
-using System.Linq;
 using System.Net;
-using System.Security.Cryptography.X509Certificates;
 using System.Web.Mvc;
 using AssignmentMVC.Models;
+using AssignmentMVC.Models.ViewModels;
 using AssignmentMVC.Repositories;
 
 namespace AssignmentMVC.Controllers
@@ -33,24 +32,23 @@ namespace AssignmentMVC.Controllers
             {
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
             }
+
             Trainer trainer = trainerRepos.Find(id);
+
             if (trainer == null)
             {
                 return HttpNotFound();
             }
+
             return View(trainer);
         }
 
         // GET: Trainer/Create
         public ActionResult Create()
         {
-            ViewBag.SelectedCourseIds = courseRepos.Get().Select(c => new SelectListItem()
-            {
-                Value = c.CourseId.ToString(),
-                Text = c.Title
-            });
+            var vm = new TrainerViewModel(trainerRepos, courseRepos);
 
-            return View();
+            return View(vm);
         }
 
         // POST: Trainer/Create
@@ -58,19 +56,18 @@ namespace AssignmentMVC.Controllers
         // more details see https://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Create([Bind(Include = "TrainerId,FirstName,LastName,Subject")] Trainer trainer, IEnumerable<int> SelectedCourseIds)
+        public ActionResult Create([Bind(Include = "TrainerId,FirstName,LastName,Subject")] Trainer trainer, IEnumerable<int> CourseList)
         {
             if (ModelState.IsValid)
             {
-                trainerRepos.AttachTrainerCourses(trainer);
-                trainerRepos.SaveChanges();
-                trainerRepos.AssignTrainerCourses(trainer, SelectedCourseIds);
-                //trainerRepos.Create(trainer, SelectedCourseIds);
-                trainerRepos.SaveChanges();
+                trainerRepos.AssignTrainerCourses(trainer, CourseList);
+                trainerRepos.Create(trainer);
                 return RedirectToAction("Index");
             }
 
-            return View(trainer);
+            var vm = new TrainerViewModel(trainerRepos, courseRepos);
+
+            return View(vm);
         }
 
         // GET: Trainer/Edit/5
@@ -80,12 +77,17 @@ namespace AssignmentMVC.Controllers
             {
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
             }
+
             Trainer trainer = trainerRepos.Find(id);
+
             if (trainer == null)
             {
                 return HttpNotFound();
             }
-            return View(trainer);
+
+            var vm = new TrainerViewModel(trainerRepos, courseRepos, trainer);
+
+            return View(vm);
         }
 
         // POST: Trainer/Edit/5
@@ -93,14 +95,21 @@ namespace AssignmentMVC.Controllers
         // more details see https://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Edit([Bind(Include = "TrainerId,FirstName,LastName,Subject")] Trainer trainer)
+        public ActionResult Edit([Bind(Include = "TrainerId,FirstName,LastName,Subject")] Trainer trainer, IEnumerable<int> SelectedCourseList)
         {
             if (ModelState.IsValid)
             {
+                trainerRepos.AttachTrainerCourses(trainer);
+                trainerRepos.ClearTrainerCourses(trainer);
+                trainerRepos.SaveChanges();
+                trainerRepos.AssignTrainerCourses(trainer, SelectedCourseList);
                 trainerRepos.Edit(trainer);
                 return RedirectToAction("Index");
             }
-            return View(trainer);
+
+            var vm = new TrainerViewModel(trainerRepos, courseRepos, trainer);
+
+            return View(vm);
         }
 
         // GET: Trainer/Delete/5
@@ -110,7 +119,9 @@ namespace AssignmentMVC.Controllers
             {
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
             }
+
             Trainer trainer = trainerRepos.Find(id);
+
             if (trainer == null)
             {
                 return HttpNotFound();

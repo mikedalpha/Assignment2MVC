@@ -37,11 +37,11 @@ namespace AssignmentMVC.Repositories
             trainer.Courses.Clear();
         }
 
-        public void AssignTrainerCourses(Trainer trainer, IEnumerable<int> SelectedCourseIds)
+        public void AssignTrainerCourses(Trainer trainer, IEnumerable<int> CourseList)
         {
-            if (SelectedCourseIds != null)
+            if (CourseList != null)
             {
-                foreach (var id in SelectedCourseIds)
+                foreach (var id in CourseList)
                 {
                     Course course = dbContext.Courses.Find(id);
                     if (course != null)
@@ -51,28 +51,14 @@ namespace AssignmentMVC.Repositories
                 }
             }
 
-            dbContext.Entry(trainer).State = EntityState.Added;
+            SaveChanges();
         }
 
-        //public void Create(Trainer trainer, IEnumerable<int> SelectedCourseIds)
-        //{
-        //    dbContext.Trainers.Attach(trainer);
-        //    dbContext.Entry(trainer).Collection("Courses").Load();
-
-        //    if (SelectedCourseIds != null)
-        //    {
-        //        foreach (var id in SelectedCourseIds)
-        //        {
-        //            Course course = dbContext.Courses.Find(id);
-        //            if (course != null)
-        //            {
-        //                trainer.Courses.Add(course);
-        //            }
-        //        }
-        //    }
-
-        //    dbContext.Entry(trainer).State = EntityState.Added;
-        //}
+        public void Create(Trainer trainer)
+        {
+            dbContext.Entry(trainer).State = EntityState.Added;
+            SaveChanges();
+        }
 
         public void Edit(Trainer trainer)
         {

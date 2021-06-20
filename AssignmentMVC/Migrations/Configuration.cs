@@ -54,14 +54,13 @@ namespace AssignmentMVC.Migrations
             var s9 = new Student() { FirstName = "Odysseas", LastName = "Argyris", DateOfBirth = new DateTime(1992, 1, 19), TuitionFees = 2500, Courses = new Collection<Course>() { c5 }, Assignments = new Collection<Assignment>() { a5 } };
             var s10 = new Student() { FirstName = "John", LastName = "Antoniou", DateOfBirth = new DateTime(1998, 9, 8), TuitionFees = 250, Courses = new Collection<Course>() { c4, c5 }, Assignments = new Collection<Assignment>() { a4, a5, a6 } };
 
-            var students = new List<Student>() { s1, s2, s3, s4, s5 };
-
-
+            var students = new List<Student>() { s1, s2, s3, s4, s5, s6, s7, s8, s9, s10 };
 
             foreach (var student in students)
             {
                 context.Students.AddOrUpdate(s => new { s.FirstName, s.LastName, s.DateOfBirth }, student);
             }
+
             var t1 = new Trainer() { FirstName = "Konstantinos", LastName = "Takakis", Subject = "Programming", Courses = new Collection<Course>() { c1, c2 } };
             var t2 = new Trainer() { FirstName = "Sakis", LastName = "Siklarlis", Subject = "Database", Courses = new Collection<Course>() { c2, c3 } };
             var t3 = new Trainer() { FirstName = "Ektoras", LastName = "Gkatsios", Subject = "Programming", Courses = new Collection<Course>() { c1, c5 } };
