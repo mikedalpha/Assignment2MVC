@@ -1,8 +1,6 @@
 ﻿using System.Collections.Generic;
-using System.Data.Entity;
 using System.Net;
 using System.Web.Mvc;
-using AssignmentMVC.DAL;
 using AssignmentMVC.Models;
 using AssignmentMVC.Models.ViewModels;
 using AssignmentMVC.Repositories;
@@ -99,19 +97,19 @@ namespace AssignmentMVC.Controllers
         // more details see https://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Edit([Bind(Include = "AssignmentId,Title,Description,SubDateTime,OralMark,TotalMark")] Assignment assignment, IEnumerable<int> StudentList, IEnumerable<int> CourseList)
+        public ActionResult Edit([Bind(Include = "AssignmentId,Title,Description,SubDateTime,OralMark,TotalMark")] Assignment assignment, IEnumerable<int> SelectedStudentList, IEnumerable<int> SelectedCourseList)
         {
             if (ModelState.IsValid)
             {
                 assignmentRepos.AttachAssignmentStudents(assignment);
                 assignmentRepos.ClearAssignmentStudents(assignment);
                 assignmentRepos.SaveChanges();
-                assignmentRepos.AssignAssignmentStudents(assignment, StudentList);
+                assignmentRepos.AssignAssignmentStudents(assignment, SelectedStudentList);
 
                 assignmentRepos.AttachAssignmentCourses(assignment);
                 assignmentRepos.ClearAssignmentCourses(assignment);
                 assignmentRepos.SaveChanges();
-                assignmentRepos.AssignAssignmentCourses(assignment, CourseList);
+                assignmentRepos.AssignAssignmentCourses(assignment, SelectedCourseList);
 
                 assignmentRepos.Edit(assignment);
 

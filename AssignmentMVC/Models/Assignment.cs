@@ -12,7 +12,7 @@ namespace AssignmentMVC.Models
         public int AssignmentId { get; set; }
         public string Title { get; set; }
         public string Description { get; set; }
-        [DisplayName("Submission Deadline")]
+        [DisplayName("Submission Date")]
         public DateTime SubDateTime { get; set; }
         [DisplayName("Oral Mark")]
         public int OralMark { get; set; }

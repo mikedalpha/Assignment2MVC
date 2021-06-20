@@ -1,20 +1,35 @@
-﻿using System.Data.Entity;
+﻿using System.Collections.Generic;
+using System.Data.Entity;
 using System.Linq;
 using System.Net;
 using System.Web.Mvc;
 using AssignmentMVC.DAL;
 using AssignmentMVC.Models;
+using AssignmentMVC.Models.ViewModels;
+using AssignmentMVC.Repositories;
 
 namespace AssignmentMVC.Controllers
 {
     public class CourseController : Controller
     {
-        private ApplicationDbContext db = new ApplicationDbContext();
+        private readonly CourseRepos courseRepos;
+        private readonly TrainerRepos trainerRepos;
+        private readonly StudentRepos studentRepos;
+        private readonly AssignmentRepos assignmentRepos;
 
+        public CourseController()
+        {
+            courseRepos = new CourseRepos();
+            trainerRepos = new TrainerRepos();
+            studentRepos = new StudentRepos();
+            assignmentRepos = new AssignmentRepos();
+        }
+        
         // GET: Course
         public ActionResult Index()
         {
-            return View(db.Courses.ToList());
+            var courses = courseRepos.Get();
+            return View(courses);
         }
 
         // GET: Course/Details/5
@@ -24,7 +39,9 @@ namespace AssignmentMVC.Controllers
             {
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
             }
-            Course course = db.Courses.Find(id);
+
+            Course course = courseRepos.Find(id);
+
             if (course == null)
             {
                 return HttpNotFound();
@@ -35,7 +52,9 @@ namespace AssignmentMVC.Controllers
         // GET: Course/Create
         public ActionResult Create()
         {
-            return View();
+            var vm = new CourseViewModel(courseRepos, trainerRepos, studentRepos, assignmentRepos);
+
+            return View(vm);
         }
 
         // POST: Course/Create
@@ -43,16 +62,21 @@ namespace AssignmentMVC.Controllers
         // more details see https://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Create([Bind(Include = "CourseId,Title,Stream,Type,StartDate,EndDate")] Course course)
+        public ActionResult Create([Bind(Include = "CourseId,Title,Stream,Type,StartDate,EndDate")] Course course, IEnumerable<int> TrainerList, IEnumerable<int> StudentList, IEnumerable<int> AssignmentList)
         {
             if (ModelState.IsValid)
             {
-                db.Courses.Add(course);
-                db.SaveChanges();
+                courseRepos.AssignCourseTrainers(course, TrainerList);
+                courseRepos.AssignCourseStudents(course, StudentList);
+                courseRepos.AssignCourseAssignments(course, AssignmentList);
+                courseRepos.Create(course);
+
                 return RedirectToAction("Index");
             }
 
-            return View(course);
+            var vm = new CourseViewModel(courseRepos, trainerRepos, studentRepos, assignmentRepos);
+
+            return View(vm);
         }
 
         // GET: Course/Edit/5
@@ -62,12 +86,17 @@ namespace AssignmentMVC.Controllers
             {
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
             }
-            Course course = db.Courses.Find(id);
+
+            Course course = courseRepos.Find(id);
+
             if (course == null)
             {
                 return HttpNotFound();
             }
-            return View(course);
+
+            var vm = new CourseViewModel(courseRepos, trainerRepos, studentRepos, assignmentRepos, course);
+
+            return View(vm);
         }
 
         // POST: Course/Edit/5
@@ -75,15 +104,33 @@ namespace AssignmentMVC.Controllers
         // more details see https://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Edit([Bind(Include = "CourseId,Title,Stream,Type,StartDate,EndDate")] Course course)
+        public ActionResult Edit([Bind(Include = "CourseId,Title,Stream,Type,StartDate,EndDate")] Course course, IEnumerable<int> SelectedTrainerList, IEnumerable<int> SelectedStudentList, IEnumerable<int> SelectedAssignmentList)
         {
             if (ModelState.IsValid)
             {
-                db.Entry(course).State = EntityState.Modified;
-                db.SaveChanges();
+                courseRepos.AttachCourseTrainers(course);
+                courseRepos.ClearCourseTrainers(course);
+                courseRepos.SaveChanges();
+                courseRepos.AssignCourseTrainers(course, SelectedTrainerList);
+
+                courseRepos.AttachCourseStudents(course);
+                courseRepos.ClearCourseStudents(course);
+                courseRepos.SaveChanges();
+                courseRepos.AssignCourseStudents(course, SelectedStudentList);
+
+                courseRepos.AttachCourseAssignments(course);
+                courseRepos.ClearCourseAssignments(course);
+                courseRepos.SaveChanges();
+                courseRepos.AssignCourseAssignments(course, SelectedAssignmentList);
+
+                courseRepos.Edit(course);
+
                 return RedirectToAction("Index");
             }
-            return View(course);
+
+            var vm = new CourseViewModel(courseRepos, trainerRepos, studentRepos, assignmentRepos, course);
+
+            return View(vm);
         }
 
         // GET: Course/Delete/5
@@ -93,11 +140,14 @@ namespace AssignmentMVC.Controllers
             {
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
             }
-            Course course = db.Courses.Find(id);
+
+            Course course = courseRepos.Find(id);
+
             if (course == null)
             {
                 return HttpNotFound();
             }
+
             return View(course);
         }
 
@@ -106,9 +156,9 @@ namespace AssignmentMVC.Controllers
         [ValidateAntiForgeryToken]
         public ActionResult DeleteConfirmed(int id)
         {
-            Course course = db.Courses.Find(id);
-            db.Courses.Remove(course);
-            db.SaveChanges();
+            Course course = courseRepos.Find(id);
+            courseRepos.Delete(course);
+
             return RedirectToAction("Index");
         }
 
@@ -116,7 +166,7 @@ namespace AssignmentMVC.Controllers
         {
             if (disposing)
             {
-                db.Dispose();
+                courseRepos.Dispose();
             }
             base.Dispose(disposing);
         }

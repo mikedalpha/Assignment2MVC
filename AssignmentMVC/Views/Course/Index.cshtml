@@ -30,7 +30,18 @@
                     <th>
                         @Html.DisplayNameFor(model => model.EndDate)
                     </th>
-                    <th>Actions</th>
+                    <th>
+                        Assigned Trainers
+                    </th>
+                    <th>
+                        Assigned Students
+                    </th>
+                    <th>
+                        Assignments
+                    </th>
+                    <th>
+                        Actions
+                    </th>
                 </tr>
 
                 @foreach (var course in Model)
@@ -50,6 +61,33 @@
                         </td>
                         <td>
                             @course.EndDate.ToString("d")
+                        </td>
+                        <td>
+
+                            <ul>
+                                @foreach (var trainer in course.Trainers)
+                                {
+                                    <li>@trainer.FirstName @trainer.LastName</li>
+                                }
+                            </ul>
+                        </td>
+                        <td>
+
+                            <ul>
+                                @foreach (var student in course.Students)
+                                {
+                                    <li>@student.FirstName @student.LastName</li>
+                                }
+                            </ul>
+                        </td>
+                        <td>
+
+                            <ul>
+                                @foreach (var assignment in course.Assignments)
+                                {
+                                    <li>@assignment.Title</li>
+                                }
+                            </ul>
                         </td>
                         <td>
                             @Html.ActionLink("Details", "Details", new { id = course.CourseId }, new { @class = "btn btn-secondary" })

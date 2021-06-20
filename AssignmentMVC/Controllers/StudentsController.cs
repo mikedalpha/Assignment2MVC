@@ -112,6 +112,7 @@ namespace AssignmentMVC.Controllers
                 studentRepos.AssignStudentAssignments(student, SelectedAssignmentList);
 
                 studentRepos.Edit(student);
+
                 return RedirectToAction("Index");
             }
 
