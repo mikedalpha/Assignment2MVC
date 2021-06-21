@@ -13,7 +13,7 @@ namespace AssignmentMVC.Migrations
         
         string IMigrationMetadata.Id
         {
-            get { return "202106171024155_InitialModel"; }
+            get { return "202106212004502_InitialModel"; }
         }
         
         string IMigrationMetadata.Source
