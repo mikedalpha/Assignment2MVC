@@ -1,9 +1,11 @@
 ﻿using System.Collections.Generic;
 using System.Net;
+using System.Linq;
 using System.Web.Mvc;
 using AssignmentMVC.Models;
 using AssignmentMVC.Models.ViewModels;
 using AssignmentMVC.Repositories;
+using PagedList;
 
 namespace AssignmentMVC.Controllers
 {
@@ -21,10 +23,71 @@ namespace AssignmentMVC.Controllers
         }
 
         // GET: Assignment
-        public ActionResult Index()
+        public ActionResult Index(string sortOrder, string currentFilter, string searchString, int? page)
         {
+            ViewBag.currentName = searchString;
+            ViewBag.CurrentSort = sortOrder;
+            ViewBag.TitleSortParm = string.IsNullOrEmpty(sortOrder) ? "title_desc" : "";
+            ViewBag.SubmissionDateSortParm = sortOrder == "Submission Date" ? "submissionDate_desc" : "Submission Date";
+            ViewBag.OralMarkSortParm = sortOrder == "Oral Mark" ? "oralMark_desc" : "Oral Mark";
+            ViewBag.TotalMarkSortParm = sortOrder == "Total Mark" ? "totalMark_desc" : "Total Mark";
+
             var assignments = assignmentRepos.Get();
-            return View(assignments);
+
+            #region Pagination
+            if (searchString != null)
+            {
+                page = 1;
+            }
+            else
+            {
+                searchString = currentFilter;
+            }
+
+            ViewBag.CurrentFilter = searchString;
+            #endregion
+
+            #region Filtering
+            if (!string.IsNullOrEmpty(searchString))
+            {
+                assignments = assignments.Where(a => a.Title.ToUpper().Contains(searchString.ToUpper()));
+            }
+            #endregion
+
+            #region Sorting
+            switch (sortOrder)
+            {
+                case "title_desc":
+                    assignments = assignments.OrderByDescending(a => a.Title);
+                    break;
+                case "Submission Date":
+                    assignments = assignments.OrderBy(a => a.SubDateTime);
+                    break;
+                case "submissionDate_desc":
+                    assignments = assignments.OrderByDescending(a => a.SubDateTime);
+                    break;
+                case "Oral Mark":
+                    assignments = assignments.OrderBy(a => a.OralMark);
+                    break;
+                case "oralMark_desc":
+                    assignments = assignments.OrderByDescending(a => a.OralMark);
+                    break;
+                case "Total Mark":
+                    assignments = assignments.OrderBy(a => a.TotalMark);
+                    break;
+                case "totalMark_desc":
+                    assignments = assignments.OrderByDescending(a => a.TotalMark);
+                    break;
+                default:
+                    assignments = assignments.OrderBy(a => a.Title);
+                    break;
+            }
+            #endregion
+
+            int pageSize = 5;
+            int pageNumber = (page ?? 1);
+
+            return View(assignments.ToPagedList(pageNumber, pageSize));
         }
 
         // GET: Assignment/Details/5

@@ -9,6 +9,7 @@ namespace AssignmentMVC.Repositories
     public class TrainerRepos
     {
         private readonly ApplicationDbContext dbContext;
+        
 
         public TrainerRepos()
         {
@@ -19,6 +20,11 @@ namespace AssignmentMVC.Repositories
         {
             var trainers = dbContext.Trainers.ToList();
             return trainers;
+        }
+
+        public DbSet<Trainer> TrainerDbSet()
+        {
+            return dbContext.Trainers;
         }
 
         public Trainer Find(int? id)

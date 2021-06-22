@@ -1,9 +1,11 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using System.Net;
 using System.Web.Mvc;
 using AssignmentMVC.Models;
 using AssignmentMVC.Models.ViewModels;
 using AssignmentMVC.Repositories;
+using PagedList;
 
 namespace AssignmentMVC.Controllers
 {
@@ -21,10 +23,73 @@ namespace AssignmentMVC.Controllers
         }
 
         // GET: Students
-        public ActionResult Index()
+        public ActionResult Index(string sortOrder, string currentFilter, string searchString, int? page)
         {
+            ViewBag.currentName = searchString;
+            ViewBag.CurrentSort = sortOrder;
+            ViewBag.NameSortParm = string.IsNullOrEmpty(sortOrder) ? "name_desc" : "";
+            ViewBag.LastNameSortParm = sortOrder == "Last Name" ? "lastName_desc" : "Last Name";
+            ViewBag.DateOfBirthSortParm = sortOrder == "Date of Birth" ? "dateOfBirth_desc" : "Date of Birth";
+            ViewBag.TuitionFeesSortParm = sortOrder == "Tuition Fees" ? "tuitionFees_desc" : "Tuition Fees";
+
             var students = studentRepos.Get();
-            return View(students);
+
+            #region Pagination
+            if (searchString != null)
+            {
+                page = 1;
+            }
+            else
+            {
+                searchString = currentFilter;
+            }
+
+            ViewBag.CurrentFilter = searchString;
+            #endregion
+
+            #region Filtering
+            if (!string.IsNullOrEmpty(searchString))
+            {
+                students = students.Where(s => s.FirstName.ToUpper().Contains(searchString.ToUpper()) ||
+                                               s.LastName.ToUpper().Contains(searchString.ToUpper())).ToList();
+            }
+            #endregion
+
+            #region Sorting
+            switch (sortOrder)
+            {
+                case "name_desc":
+                    students = students.OrderByDescending(s => s.FirstName);
+                    break;
+                case "Last Name":
+                    students = students.OrderBy(s => s.LastName);
+                    break;
+                case "lastName_desc":
+                    students = students.OrderByDescending(s => s.LastName);
+                    break;
+                case "Date of Birth":
+                    students = students.OrderBy(s => s.DateOfBirth);
+                    break;
+                case "dateOfBirth_desc":
+                    students = students.OrderByDescending(s => s.DateOfBirth);
+                    break;
+                case "Tuition Fees":
+                    students = students.OrderBy(s => s.TuitionFees);
+                    break;
+                case "tuitionFees_desc":
+                    students = students.OrderByDescending(s => s.TuitionFees);
+                    break;
+                default:
+                    students = students.OrderBy(s => s.FirstName);
+                    break;
+            }
+            #endregion
+
+            int pageSize = 5;
+            int pageNumber = (page ?? 1);
+
+
+            return View(students.ToPagedList(pageNumber, pageSize));
         }
 
         // GET: Students/Details/5

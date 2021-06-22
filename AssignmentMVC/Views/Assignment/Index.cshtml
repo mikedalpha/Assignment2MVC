@@ -1,4 +1,7 @@
-﻿@model IEnumerable<AssignmentMVC.Models.Assignment>
+﻿@model PagedList.IPagedList<AssignmentMVC.Models.Assignment>
+@using PagedList.Mvc
+
+<link href="~/Content/PagedList.css" rel="stylesheet" type="text/css" />
 
 @{
     ViewBag.Title = "Index";
@@ -12,24 +15,36 @@
                 @Html.ActionLink("Create New", "Create", null, new { @class = "btn btn-success" })
             </div>
 
+            <br />
+
+            @using (Html.BeginForm("Index", "Assignment", FormMethod.Get))
+            {
+                <p>
+                    Find by title: @Html.TextBox("searchString", ViewBag.CurrentFilter as string)
+                    <input type="submit" value="Search" />
+                </p>
+            }
+
+            <br />
+
             <!--Table-->
 
             <table class="table table-hover table-responsive-lg">
                 <tr>
                     <th>
-                        @Html.DisplayNameFor(model => model.Title)
+                        @Html.ActionLink("Title", "Index", new { sortOrder = ViewBag.TitleSortParm, currentFilter = ViewBag.CurrentFilter })
                     </th>
                     <th>
-                        @Html.DisplayNameFor(model => model.Description)
+                        Description
                     </th>
                     <th>
-                        @Html.DisplayNameFor(model => model.SubDateTime)
+                        @Html.ActionLink("Submission Date", "Index", new { sortOrder = ViewBag.SubmissionDateSortParm, currentFilter = ViewBag.CurrentFilter })
                     </th>
                     <th>
-                        @Html.DisplayNameFor(model => model.OralMark)
+                        @Html.ActionLink("Oral Mark", "Index", new { sortOrder = ViewBag.OralMarkSortParm, currentFilter = ViewBag.CurrentFilter })
                     </th>
                     <th>
-                        @Html.DisplayNameFor(model => model.TotalMark)
+                        @Html.ActionLink("Total Mark", "Index", new { sortOrder = ViewBag.TotalMarkSortParm, currentFilter = ViewBag.CurrentFilter })
                     </th>
                     <th>
                         Assigned To
@@ -52,7 +67,7 @@
                             @Html.DisplayFor(modelItem => assignment.Description)
                         </td>
                         <td>
-                            @Html.DisplayFor(modelItem => assignment.SubDateTime)
+                            @assignment.SubDateTime.ToString("d")
                         </td>
                         <td>
                             @Html.DisplayFor(modelItem => assignment.OralMark)
@@ -64,7 +79,7 @@
                             <ul>
                                 @foreach (var student in assignment.Students)
                                 {
-                                <li>@student.FirstName @student.LastName</li>
+                                    <li>@student.FirstName @student.LastName</li>
                                 }
                             </ul>
                         </td>
@@ -84,6 +99,11 @@
                     </tr>
                 }
             </table>
+            <br />
+            Page @(Model.PageCount < Model.PageNumber ? 0 : Model.PageNumber) of @Model.PageCount
+
+            @Html.PagedListPager(Model, page => Url.Action("Index",
+                new { page, sortOrder = ViewBag.CurrentSort, currentFilter = ViewBag.CurrentFilter }))
         </div>
     </div>
 </div>

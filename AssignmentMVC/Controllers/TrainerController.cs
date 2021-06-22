@@ -1,9 +1,11 @@
 ﻿using System.Collections.Generic;
 using System.Net;
+using System.Linq;
 using System.Web.Mvc;
 using AssignmentMVC.Models;
 using AssignmentMVC.Models.ViewModels;
 using AssignmentMVC.Repositories;
+using PagedList;
 
 namespace AssignmentMVC.Controllers
 {
@@ -19,10 +21,58 @@ namespace AssignmentMVC.Controllers
         }
 
         // GET: Trainer
-        public ActionResult Index()
+        public ActionResult Index(string sortOrder, string currentFilter, string searchString, int? page)
         {
+            ViewBag.currentName = searchString;
+            ViewBag.CurrentSort = sortOrder;
+            ViewBag.NameSortParm = string.IsNullOrEmpty(sortOrder) ? "name_desc" : "";
+            ViewBag.SubjectSortParm = sortOrder == "Subject" ? "subject_desc" : "Subject";
+
             var trainers = trainerRepos.Get();
-            return View(trainers);
+
+            #region Pagination
+            if (searchString != null)
+            {
+                page = 1;
+            }
+            else
+            {
+                searchString = currentFilter;
+            }
+
+            ViewBag.CurrentFilter = searchString;
+            #endregion
+
+            #region Filtering
+            if (!string.IsNullOrEmpty(searchString))
+            {
+                trainers = trainers.Where(t => t.FirstName.ToUpper().Contains(searchString.ToUpper()) ||
+                                               t.LastName.ToUpper().Contains(searchString.ToUpper())).ToList();
+            }
+            #endregion
+
+            #region Sorting
+            switch (sortOrder)
+            {
+                case "name_desc":
+                    trainers = trainers.OrderByDescending(t => t.FirstName);
+                    break;
+                case "Subject":
+                    trainers = trainers.OrderBy(t => t.Subject);
+                    break;
+                case "subject_desc":
+                    trainers = trainers.OrderByDescending(t => t.Subject);
+                    break;
+                default:
+                    trainers = trainers.OrderBy(t => t.FirstName);
+                    break;
+            }
+            #endregion
+
+            int pageSize = 5;
+            int pageNumber = (page ?? 1);
+
+            return View(trainers.ToPagedList(pageNumber, pageSize));
         }
 
         // GET: Trainer/Details/5

@@ -1,4 +1,7 @@
-﻿@model IEnumerable<AssignmentMVC.Models.Trainer>
+﻿@model PagedList.IPagedList<AssignmentMVC.Models.Trainer>
+@using PagedList.Mvc
+
+<link href="~/Content/PagedList.css" rel="stylesheet" type="text/css" />
 
 @{
     ViewBag.Title = "Index";
@@ -12,19 +15,31 @@
                 @Html.ActionLink("Create New", "Create", null, new { @class = "btn btn-success" })
             </div>
 
+            <br />
+
+            @using (Html.BeginForm("Index", "Trainer", FormMethod.Get))
+            {
+                <p>
+                    Find by name: @Html.TextBox("searchString", ViewBag.CurrentFilter as string)
+                    <input type="submit" value="Search by Name" />
+                </p>
+            }
+
+            <br />
+
             <!--Table-->
             <div class="mt-4 mb-0">
                 <table class="table table-hover table-responsive-lg">
                     <thead>
                         <tr>
                             <th>
-                                Full Name
+                                @Html.ActionLink("Full Name", "Index", new { sortOrder = ViewBag.NameSortParm, currentFilter = ViewBag.CurrentFilter })
                             </th>
                             <th>
-                                @Html.DisplayNameFor(model => model.Subject)
+                                @Html.ActionLink("Subject", "Index", new { sortOrder = ViewBag.SubjectSortParm, currentFilter = ViewBag.CurrentFilter })
                             </th>
                             <th>
-                                @Html.DisplayNameFor(model => model.Courses)
+                                Courses
                             </th>
                             <th>
                                 Actions
@@ -60,6 +75,11 @@
                         }
                     </tbody>
                 </table>
+                <br />
+                Page @(Model.PageCount < Model.PageNumber ? 0 : Model.PageNumber) of @Model.PageCount
+
+                @Html.PagedListPager(Model, page => Url.Action("Index",
+                    new { page, sortOrder = ViewBag.CurrentSort, currentFilter = ViewBag.CurrentFilter }))
             </div>
         </div>
     </div>

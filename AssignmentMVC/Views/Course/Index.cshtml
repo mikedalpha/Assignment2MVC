@@ -1,4 +1,7 @@
-﻿@model IEnumerable<AssignmentMVC.Models.Course>
+﻿@model PagedList.IPagedList<AssignmentMVC.Models.Course>
+@using PagedList.Mvc
+
+<link href="~/Content/PagedList.css" rel="stylesheet" type="text/css" />
 
 @{
     ViewBag.Title = "Index";
@@ -12,23 +15,35 @@
                 @Html.ActionLink("Create New", "Create", null, new { @class = "btn btn-success" })
             </div>
 
+            <br />
+
+            @using (Html.BeginForm("Index", "Course", FormMethod.Get))
+            {
+                <p>
+                    Find by title: @Html.TextBox("searchString", ViewBag.CurrentFilter as string)
+                    <input type="submit" value="Search" />
+                </p>
+            }
+
+            <br />
+
             <!--Table-->
             <table class="table table-hover table-responsive-lg">
                 <tr>
                     <th>
-                        @Html.DisplayNameFor(model => model.Title)
+                        @Html.ActionLink("Title", "Index", new { sortOrder = ViewBag.TitleSortParm, currentFilter = ViewBag.CurrentFilter })
                     </th>
                     <th>
-                        @Html.DisplayNameFor(model => model.Stream)
+                        @Html.ActionLink("Stream", "Index", new { sortOrder = ViewBag.StreamSortParm, currentFilter = ViewBag.CurrentFilter })
                     </th>
                     <th>
-                        @Html.DisplayNameFor(model => model.Type)
+                        Type
                     </th>
                     <th>
-                        @Html.DisplayNameFor(model => model.StartDate)
+                        @Html.ActionLink("Start Date", "Index", new { sortOrder = ViewBag.StartDateSortParm, currentFilter = ViewBag.CurrentFilter })
                     </th>
                     <th>
-                        @Html.DisplayNameFor(model => model.EndDate)
+                        @Html.ActionLink("End Date", "Index", new { sortOrder = ViewBag.EndDateSortParm, currentFilter = ViewBag.CurrentFilter })
                     </th>
                     <th>
                         Assigned Trainers
@@ -97,6 +112,11 @@
                     </tr>
                 }
             </table>
+            <br />
+            Page @(Model.PageCount < Model.PageNumber ? 0 : Model.PageNumber) of @Model.PageCount
+
+            @Html.PagedListPager(Model, page => Url.Action("Index",
+                new { page, sortOrder = ViewBag.CurrentSort, currentFilter = ViewBag.CurrentFilter }))
         </div>
     </div>
 </div>

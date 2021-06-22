@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.ComponentModel.DataAnnotations;
 using AssignmentMVC.Models.Validations;
 using FluentValidation.Attributes;
 
@@ -13,6 +14,8 @@ namespace AssignmentMVC.Models
         public string Title { get; set; }
         public string Description { get; set; }
         [DisplayName("Submission Date")]
+        [DataType(DataType.Date)]
+        [DisplayFormat(DataFormatString = "{0:yyyy-MM-dd}", ApplyFormatInEditMode = true)]
         public DateTime SubDateTime { get; set; }
         [DisplayName("Oral Mark")]
         public int OralMark { get; set; }
