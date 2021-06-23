@@ -17,7 +17,7 @@
             <div class="form-group">
                 <strong style=color:red>*</strong>@Html.LabelFor(model => model.Student.FirstName, htmlAttributes: new { @class = "control-label col-md-2" })
                 <div class="col-md-10">
-                    @Html.EditorFor(model => model.Student.FirstName, new { htmlAttributes = new { @class = "form-control" } })
+                    @Html.EditorFor(model => model.Student.FirstName, new { htmlAttributes = new { @class = "form-control", placeholder = "Only letters, must be 2-50 characters" } })
                     @Html.ValidationMessageFor(model => model.Student.FirstName, "", new { @class = "text-danger" })
                 </div>
             </div>
@@ -25,15 +25,15 @@
             <div class="form-group">
                 <strong style=color:red>*</strong>@Html.LabelFor(model => model.Student.LastName, htmlAttributes: new { @class = "control-label col-md-2" })
                 <div class="col-md-10">
-                    @Html.EditorFor(model => model.Student.LastName, new { htmlAttributes = new { @class = "form-control" } })
+                    @Html.EditorFor(model => model.Student.LastName, new { htmlAttributes = new { @class = "form-control", placeholder = "Only letters, must be 2-50 characters" } })
                     @Html.ValidationMessageFor(model => model.Student.LastName, "", new { @class = "text-danger" })
                 </div>
             </div>
 
             <div class="form-group">
-                <strong style=color:red>*</strong>@Html.LabelFor(model => model.Student.DateOfBirth, htmlAttributes: new { @class = "control-label col-md-2" })
+                <strong style=color:red>*</strong>@Html.LabelFor(model => model.Student.DateOfBirth, htmlAttributes: new { @class = "control-label col-md-2" })<span>(18-100 yrs old)</span>
                 <div class="col-md-10">
-                    @Html.EditorFor(model => model.Student.DateOfBirth, new { htmlAttributes = new { @class = "form-control" } })
+                    @Html.EditorFor(model => model.Student.DateOfBirth, new { htmlAttributes = new { @class = "form-control", type = "date", min = DateTime.Now.Year - 100, max = DateTime.Now.Year - 18 } })
                     @Html.ValidationMessageFor(model => model.Student.DateOfBirth, "", new { @class = "text-danger" })
                 </div>
             </div>
@@ -41,7 +41,7 @@
             <div class="form-group">
                 <strong style=color:red>*</strong>@Html.LabelFor(model => model.Student.TuitionFees, htmlAttributes: new { @class = "control-label col-md-2" })
                 <div class="col-md-10">
-                    @Html.EditorFor(model => model.Student.TuitionFees, new { htmlAttributes = new { @class = "form-control" } })
+                    @Html.EditorFor(model => model.Student.TuitionFees, new { htmlAttributes = new { @class = "form-control", placeholder = "Value between 0-2500" } })
                     @Html.ValidationMessageFor(model => model.Student.TuitionFees, "", new { @class = "text-danger" })
                 </div>
             </div>

@@ -23,7 +23,9 @@ namespace AssignmentMVC.Models.Validations
 
             RuleFor(c => c.StartDate).NotEmpty().WithMessage("Required Field");
 
-            RuleFor(c => c.EndDate).NotEmpty().WithMessage("Required Field");
+            RuleFor(c => c.EndDate).NotEmpty().WithMessage("Required Field")
+                .GreaterThanOrEqualTo(c => c.StartDate.Date)
+                .WithMessage("End date must be greater than or equal to Start date");
         }
     }
 }

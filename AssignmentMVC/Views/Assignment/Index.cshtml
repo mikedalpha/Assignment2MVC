@@ -21,7 +21,8 @@
             {
                 <p>
                     Find by title: @Html.TextBox("searchString", ViewBag.CurrentFilter as string)
-                    <input type="submit" value="Search" />
+                    <input type="submit" value="Search" class="btn btn-primary" />
+                    <input id="resetButtonT" type="button" value="Reset" class="btn btn-info btn-sm" />
                 </p>
             }
 
@@ -107,3 +108,14 @@
         </div>
     </div>
 </div>
+
+@section scripts
+{
+    <script>
+        $("#resetButtonT").click(function (e) {
+
+            $("#searchString").val("");
+            }
+        );
+    </script>
+}
